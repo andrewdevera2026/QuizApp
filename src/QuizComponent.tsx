@@ -8,41 +8,59 @@ type QuizQuestion = {
 
 type QuizComponentProps = {
   currQuestion: QuizQuestion;
-  onNext: () => void;
+  total: number;
+  isLast: boolean;
+  onNext: (selectedOption: string) => void;
 };
 
-function QuizComponent({ currQuestion, onNext }: QuizComponentProps) {
+function QuizComponent({
+  currQuestion,
+  total,
+  isLast,
+  onNext,
+}: QuizComponentProps) {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleNextClick = () => {
-    setSelectedOption(""); // clear the chosen answer for the next question
-    onNext();
+    onNext(selectedOption); // send the picked answer to the parent
+    setSelectedOption(""); // clear it for the next question
   };
 
   return (
-    <>
-      <div className="quiz-container">
-        <h1>Question #{currQuestion.qnum}</h1>
-        <p>{currQuestion.question}</p>
-        <ul>
-          {currQuestion.options.map((option, index) => (
-            <li key={index}>
-              <label>
-                <input
-                  type="radio"
-                  name={`question-${currQuestion.qnum}`}
-                  value={option}
-                  checked={selectedOption === option}
-                  onChange={() => setSelectedOption(option)}
-                />
-                {option}
-              </label>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleNextClick}>Next</button>
-      </div>
-    </>
+    <div className="quiz-container">
+      <p className="progress">
+        {currQuestion.qnum} of {total}
+      </p>
+      <h1>Question #{currQuestion.qnum}</h1>
+      <p>{currQuestion.question}</p>
+      <ul>
+        {currQuestion.options.map((option, index) => (
+          <li key={index}>
+            <label
+              className={
+                selectedOption === option ? "option selected" : "option"
+              }
+            >
+              <input
+                type="radio"
+                name={`question-${currQuestion.qnum}`}
+                value={option}
+                checked={selectedOption === option}
+                onChange={() => setSelectedOption(option)}
+              />{" "}
+              {option}
+            </label>
+          </li>
+        ))}
+      </ul>
+      <button
+        className="btn"
+        onClick={handleNextClick}
+        disabled={selectedOption === ""}
+      >
+        {isLast ? "Finish" : "Next"}
+      </button>
+    </div>
   );
 }
 
